@@ -1,1 +1,206 @@
 
+clc;
+clear;
+close all;
+
+%% Q19: LTE-5G SPECTRUM SHARING MODEL
+% Design a spectrum sharing model between LTE and 5G users.
+
+%% System Parameters
+
+numLTE = 20;                 % Number of LTE users
+num5G = 20;                  % Number of 5G users
+
+totalBW = 100e6;             % Total available bandwidth = 100 MHz
+
+lteBW = 40e6;                % Initial LTE bandwidth
+g5BW = totalBW - lteBW;      % Initial 5G bandwidth
+
+% Transmit powers
+ltePower = 0.2;              % LTE transmit power (W)
+g5Power = 0.2;               % 5G transmit power (W)
+
+% Noise
+noisePower = 1e-9;
+
+% Spectral efficiencies
+lteSE = 2.5;                 % bits/s/Hz
+g5SE = 5.0;                  % bits/s/Hz
+
+%% Spectrum Sharing
+
+sharingRatio = 0:0.05:1;
+
+lteThroughput = zeros(size(sharingRatio));
+g5Throughput = zeros(size(sharingRatio));
+totalThroughput = zeros(size(sharingRatio));
+
+for i = 1:length(sharingRatio)
+
+    % Shared bandwidth
+    sharedBW = 30e6 * sharingRatio(i);
+
+    % LTE dedicated bandwidth
+    lteDedicated = lteBW - sharedBW;
+
+    % 5G dedicated bandwidth
+    g5Dedicated = g5BW - sharedBW;
+
+    % Avoid negative bandwidth
+    lteDedicated = max(lteDedicated,0);
+    g5Dedicated = max(g5Dedicated,0);
+
+    % Shared bandwidth contribution
+    lteShared = sharedBW * lteSE;
+    g5Shared = sharedBW * g5SE;
+
+    % Total throughput
+    lteThroughput(i) = ...
+        (lteDedicated * lteSE + lteShared) / 1e6;
+
+    g5Throughput(i) = ...
+        (g5Dedicated * g5SE + g5Shared) / 1e6;
+
+    totalThroughput(i) = ...
+        lteThroughput(i) + g5Throughput(i);
+
+end
+
+%% Display Results
+
+fprintf('\n========================================\n');
+fprintf(' LTE - 5G SPECTRUM SHARING SIMULATION\n');
+fprintf('========================================\n');
+
+fprintf('Total Bandwidth       : %.0f MHz\n',totalBW/1e6);
+fprintf('LTE Users             : %d\n',numLTE);
+fprintf('5G Users              : %d\n',num5G);
+
+fprintf('\nInitial LTE Bandwidth : %.0f MHz\n',lteBW/1e6);
+fprintf('Initial 5G Bandwidth  : %.0f MHz\n',g5BW/1e6);
+
+%% Figure 1 - LTE Throughput
+
+figure;
+
+plot(sharingRatio*100,lteThroughput,...
+    '-o','LineWidth',2,'MarkerSize',6);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('LTE Throughput (Mbps)');
+
+title('LTE Throughput under Spectrum Sharing');
+
+%% Figure 2 - 5G Throughput
+
+figure;
+
+plot(sharingRatio*100,g5Throughput,...
+    '-s','LineWidth',2,'MarkerSize',6);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('5G Throughput (Mbps)');
+
+title('5G Throughput under Spectrum Sharing');
+
+%% Figure 3 - Total Throughput
+
+figure;
+
+plot(sharingRatio*100,totalThroughput,...
+    '-^','LineWidth',2,'MarkerSize',6);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('Total Throughput (Mbps)');
+
+title('Total Network Throughput');
+
+%% Figure 4 - LTE vs 5G Throughput
+
+figure;
+
+plot(sharingRatio*100,lteThroughput,...
+    '-o','LineWidth',2);
+
+hold on;
+
+plot(sharingRatio*100,g5Throughput,...
+    '-s','LineWidth',2);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('Throughput (Mbps)');
+
+title('LTE vs 5G Throughput');
+
+legend('LTE','5G','Location','best');
+
+%% Figure 5 - Bandwidth Allocation
+
+lteAllocated = lteBW - 30e6*sharingRatio;
+g5Allocated = g5BW - 30e6*sharingRatio;
+
+figure;
+
+plot(sharingRatio*100,lteAllocated/1e6,...
+    '-o','LineWidth',2);
+
+hold on;
+
+plot(sharingRatio*100,g5Allocated/1e6,...
+    '-s','LineWidth',2);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('Dedicated Bandwidth (MHz)');
+
+title('LTE and 5G Dedicated Bandwidth');
+
+legend('LTE','5G','Location','best');
+
+%% Figure 6 - Throughput Improvement
+
+noSharingLTE = lteBW * lteSE / 1e6;
+noSharing5G = g5BW * g5SE / 1e6;
+
+baseline = noSharingLTE + noSharing5G;
+
+improvement = ...
+    ((totalThroughput-baseline)/baseline)*100;
+
+figure;
+
+plot(sharingRatio*100,improvement,...
+    '-d','LineWidth',2,'MarkerSize',6);
+
+grid on;
+
+xlabel('Spectrum Sharing Ratio (%)');
+ylabel('Throughput Change (%)');
+
+title('Network Throughput Change due to Spectrum Sharing');
+
+%% Maximum Throughput
+
+[maxThroughput,index] = max(totalThroughput);
+
+fprintf('\nMaximum Total Throughput : %.2f Mbps\n',...
+    maxThroughput);
+
+fprintf('Optimal Sharing Ratio    : %.0f %%\n',...
+    sharingRatio(index)*100);
+
+fprintf('\nConclusion:\n');
+fprintf(['Dynamic spectrum sharing allows LTE and 5G ',...
+    'systems to utilize available spectrum efficiently.\n']);
+
+fprintf(['The sharing ratio can be adjusted according ',...
+    'to network requirements and traffic demand.\n']);
