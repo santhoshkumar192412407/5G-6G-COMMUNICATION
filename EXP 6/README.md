@@ -1,6 +1,6 @@
 # OUTPUT
 
-OBJ 1
+# OBJ 1
 <img width="845" height="785" alt="Image" src="https://github.com/user-attachments/assets/7401241e-c615-4099-aa36-60c707ddd63e" />
 
 # OBJ 2
