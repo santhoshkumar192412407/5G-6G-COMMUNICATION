@@ -1,7 +1,7 @@
 # OUTPUT
 
 # OBJ 1
-<img width="548" height="625" alt="Image" src="https://github.com/user-attachments/assets/ee0011a0-31ee-4eda-9064-75017fecbbe0" 
+<img width="548" height="625" alt="Image" src="https://github.com/user-attachments/assets/ee0011a0-31ee-4eda-9064-75017fecbbe0" />
 
   
 # OBJ 2
